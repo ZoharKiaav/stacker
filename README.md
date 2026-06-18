@@ -1,64 +1,137 @@
 <div align="center">
-  <a href="https://dokploy.com">
-    <img src=".github/sponsors/logo.png" alt="Dokploy - Open Source Alternative to Vercel, Heroku and Netlify." width="100%"  />
+  <a href="https://proniit.com">
+    <img src="https://proniit.co.za/wp-content/uploads/2026/02/proniit-cloud-vps-managed-web-hosting-logo-250.png" alt="Open Source Alternative to Vercel, Netlify and Heroku. built on Dokploy for VPStack™ Deployment." width="100%"  />
   </a>
   </br>
-  </br>
-  <p>Join us on Discord for help, feedback, and discussions!</p>
-  <a href="https://discord.gg/2tBnJ3jDJc">
-    <img src="https://discordapp.com/api/guilds/1234073262418563112/widget.png?style=banner2" alt="Discord Shield"/>
-  </a>
 </div>
 <br />
+# 🚀 Stacker™
 
+**Stacker** is a Proniit Cloud (Pty) Ltd t/a vKloud™ fork of Dokploy, reimagined as a practical, self-hosted PaaS for launching business-ready application stacks — fast, repeatable, and client-ready.
 
-Dokploy is a free, self-hostable Platform as a Service (PaaS) that simplifies the deployment and management of applications and databases.
+Stacker™ is being built as the engine behind **Stacker™ One-Click Deployment** — curated, one-click VPStacks™ tailored for small businesses, B2B workflows, and managed cloud services.
 
-## ✨ Features
+### 🧭 Product vs Platform — short and clear
 
-Dokploy includes multiple features to make your life easier.
+**VPStack™ = Product (what you deploy).**  
+A VPStack™ is a *curated, deployable bundle* — apps, config, domains, secrets, health checks, and support notes packaged as a repeatable product for customers or clients.
 
-- **Applications**: Deploy any type of application (Node.js, PHP, Python, Go, Ruby, etc.).
-- **Databases**: Create and manage databases with support for MySQL, PostgreSQL, MongoDB, MariaDB, libsql, and Redis.
-- **Backups**: Automate backups for databases to an external storage destination.
-- **Docker Compose**: Native support for Docker Compose to manage complex applications.
-- **Multi Node**: Scale applications to multiple nodes using Docker Swarm to manage the cluster.
-- **Templates**: Deploy open-source templates (Plausible, Pocketbase, Calcom, etc.) with a single click.
-- **Traefik Integration**: Automatically integrates with Traefik for routing and load balancing.
-- **Real-time Monitoring**: Monitor CPU, memory, storage, and network usage for every resource.
-- **Docker Management**: Easily deploy and manage Docker containers.
-- **CLI/API**: Manage your applications and databases using the command line or through the API.
-- **Notifications**: Get notified when your deployments succeed or fail (via Slack, Discord, Telegram, Email, etc.).
-- **Multi Server**: Deploy and manage your applications remotely to external servers.
-- **Self-Hosted**: Self-host Dokploy on your VPS.
+**Stacker™ = Platform (what runs the products).**  
+Stacker™ is the *PaaS and tooling* that authors, validates, deploys, and manages VPStacks™ across infrastructure.
 
-## 🚀 Getting Started
+**Why this matters:** VPStacks are the customer-facing SKUs you ship; Stacker is the control plane that makes one-click delivery possible.
 
-To get started, run the following command on a VPS:
+---
 
-Want to skip the installation process? [Try the Dokploy Cloud](https://app.dokploy.com).
+### 🔍 Quick comparison table
 
-```bash
-curl -sSL https://dokploy.com/install.sh | bash
-```
+| **Aspect** | **VPStack™ (Product)** | **Stacker™ (Platform)** |
+|---|---:|---:|
+| **What it is** | Packaged bundle of apps, config, domains, secrets, docs | PaaS tooling, registry, CLI/API, and orchestration engine |
+| **Audience** | SMEs, agencies, clients who need ready solutions | Operators, maintainers, platform builders |
+| **Contents** | Containers; env vars; routes; runbooks | Deployment engine; validation; automation; routing |
+| **Role** | Deployed and operated for customers | Authoring, provisioning, and lifecycle management |
+| **Reusability** | Template for repeatable business workflows | Hosts and delivers VPStack templates at scale |
 
-For detailed documentation, visit [docs.dokploy.com](https://docs.dokploy.com).
+---
 
+### 🧩 What is a VPStack™?
 
-[Github Sponsors](https://github.com/sponsors/Siumauricio)
+A **VPStack™** is more than a single app — it's a **business-purpose bundle** that packages everything needed to run a real-world solution:
 
-### Contributors 🤝
+- **Apps**; Docker containers and services
+- **Configuration**; environment variables and secrets
+- **Routing**; domains, TLS, and public URLs
+- **Health checks**; monitoring and readiness probes
+- **Support notes**; docs and runbooks for operators
+- **Repeatable templates**; for common business workflows
 
-<a href="https://github.com/dokploy/dokploy/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=dokploy/dokploy" alt="Contributors" />
-</a>
+**Why VPStacks** — because launching a website plus CRM plus billing should feel like one click, not a week of DevOps.
+---
 
-## 📺 Video Tutorial
+### ✨ Key Features
 
-<a href="https://youtu.be/mznYKPvhcfw">
-  <img src="https://dokploy.com/banner.png" alt="Watch the video" width="400"/>
-</a>
+- **Self-hosted**: Run on your infrastructure or a managed provider.  
+- **Docker-first**: Designed around containerized apps and stacks.  
+- **Business-ready**: Curated stacks for SMEs and agencies.  
+- **One-click intent**: Templates that reduce setup friction.  
+- **Registry of VPStacks**: A growing library of repeatable, tested templates.
 
-## 🤝 Contributing
+---
 
-Check out the [Contributing Guide](CONTRIBUTING.md) for more information.
+### 🔧 Status 
+
+**Active development** by Proniit Cloud (Pty) Ltd.  
+Not yet recommended as a general public distribution — we’re polishing branding, docs, security, and provisioning flows before a broad release. Expect steady improvements and early-adopter guidance.
+
+---
+
+### 🛠️ Maintainer
+
+**Proniit Cloud (Pty) Ltd**  
+Website: https://proniit.com · https://proniit.co.za  
+Project lead: **Zohar Kiaav** — https://zoharkiaav.co.za
+
+---
+
+### 📦 Stacks™ — curated multi-app bundles
+
+**Stacks™** are opinionated, curated VPStacks™ built for practical business use:
+
+- Designed for SMEs that want tools, not DevOps  
+- Include apps, domains, secrets, and support notes  
+- Packaged to be mapped to billing and provisioning systems
+
+**Example use cases:** client onboarding bundles, marketing site + CRM + analytics, support portal + ticketing + knowledge base.
+
+---
+
+### ⚙️ Current workflow
+
+1. **Define** the stack in `stack.json`.  
+2. **Manually test** deployment in VPStacker.  
+3. **Verify** app URLs, secrets, routes, and health checks.  
+4. **Map** the stack to a FOSSBilling product.  
+5. **Automate** provisioning only after manual proof is reliable.
+
+This keeps reliability high while we build automation safely.
+
+---
+
+### 🌱 First stack
+
+**ClientOps Starter** — a starter VPStack designed to get a client-facing operations suite online quickly.
+
+---
+
+### 🗺️ Diagram — how VPStacks and Stacker fit together
+
+  [ VPStack™ (product) ]  <-- defined in stack.json, includes apps/config/docs
+            │
+            │  packaged templates / registry
+            ▼
+  [ Stacker™ (platform) ]  <-- registry, CLI/API, validation, orchestration
+            │
+            │  deploys to
+            ▼
+  [ Node(s) / Cluster ]  <-- Docker runtime, Traefik routing, storage, TLS
+            │
+            ▼
+  End users / Clients (websites, APIs, dashboards)
+
+---
+
+### 🤝 Get involved
+
+Want to help shape VPStacks, test templates, or contribute docs and examples? Open a PR, file an issue, or reach out via the Proniit channels. Early contributors help steer the project and get first access to new templates.
+
+---
+
+### Quick links 🔗
+
+- GitHub: https://github.com/ZoharKiaav/stacker  
+- Proniit: https://proniit.com
+
+---
+
+**Stacker™** — make deployments delightful again. 🚀
