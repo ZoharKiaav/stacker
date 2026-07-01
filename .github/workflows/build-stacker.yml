@@ -1,8 +1,10 @@
-name: Build and Push to GHCR
+name: Build and Push Stacker to GHCR
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -13,16 +15,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set lowercase image name
+        run: |
+          REPO_LC="${GITHUB_REPOSITORY,,}"
+          echo "IMAGE_NAME=ghcr.io/${REPO_LC}/stacker:latest" >> "$GITHUB_ENV"
+          echo "Using image: ghcr.io/${REPO_LC}/stacker:latest"
+
       - name: Log in to GHCR
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
       - name: Build image
         run: |
-          docker build -t ghcr.io/${{ github.repository }}/stacker:latest .
+          docker build --progress=plain -t "$IMAGE_NAME" .
 
       - name: Push image
         run: |
-          docker push ghcr.io/${{ github.repository }}/stacker:latest
+          docker push "$IMAGE_NAME"
