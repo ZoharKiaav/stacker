@@ -27,6 +27,15 @@ jobs:
       - name: Log in to GHCR
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+      - name: Create production environment file
+        shell: bash
+        run: |
+          cat > .env.production <<'EOF'
+          NODE_ENV=production
+          NEXT_PUBLIC_APP_NAME=Stacker
+          NEXT_PUBLIC_PAGE_TITLE=Stacker
+          NEXT_PUBLIC_SITE_URL=https://stacker.proniit.com
+          EOF
 
       - name: Build image
         run: |
