@@ -41,6 +41,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
 import {
 	Breadcrumb,
 	BreadcrumbItem,
@@ -564,6 +565,8 @@ function SidebarLogo() {
 	const { isMobile } = useSidebar();
 	const isCollapsed = state === "collapsed" && !isMobile;
 	const { data: activeOrganization } = api.organization.active.useQuery();
+	const { data: haveValidLicense } =
+		api.licenseKey.haveValidLicenseKey.useQuery();
 
 	const { data: invitations, refetch: refetchInvitations } =
 		api.user.getInvitations.useQuery();
@@ -629,9 +632,14 @@ function SidebarLogo() {
 												isCollapsed && "hidden",
 											)}
 										>
-											<p className="text-sm font-medium leading-none">
-												{activeOrganization?.name ?? "Select Organization"}
-											</p>
+											<div className="flex items-center gap-1.5">
+												<p className="text-sm font-medium leading-none">
+													{activeOrganization?.name ?? "Select Organization"}
+												</p>
+												{haveValidLicense && (
+													<Badge variant="blue">Enterprise</Badge>
+												)}
+											</div>
 										</div>
 									</div>
 									<ChevronsUpDown
@@ -640,7 +648,7 @@ function SidebarLogo() {
 								</SidebarMenuButton>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent
-								className="rounded-lg max-h-[min(70vh,28rem)] flex flex-col"
+								className="w-64 rounded-lg max-h-[min(70vh,28rem)] flex flex-col"
 								align="start"
 								side={isMobile ? "bottom" : "right"}
 								sideOffset={4}
