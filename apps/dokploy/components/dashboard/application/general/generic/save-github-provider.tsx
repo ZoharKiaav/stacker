@@ -252,14 +252,19 @@ export const SaveGithubProvider = ({ applicationId }: Props) => {
 														: isLoadingRepositories
 															? "Loading...."
 															: (repositories?.find(
-																	(repo) => repo.name === field.value.repo,
+																	(repo) =>
+																		repo.name === field.value.repo &&
+																		repo.owner.login === field.value.owner,
 																)?.name ?? field.value.repo)}
 
 													<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 												</Button>
 											</FormControl>
 										</PopoverTrigger>
-										<PopoverContent className="p-0" align="start">
+										<PopoverContent
+											className="w-[var(--radix-popover-trigger-width)] p-0"
+											align="start"
+										>
 											<Command>
 												<CommandInput
 													placeholder="Search repository..."
@@ -279,7 +284,7 @@ export const SaveGithubProvider = ({ applicationId }: Props) => {
 													<CommandGroup>
 														{repositories?.map((repo) => (
 															<CommandItem
-																value={repo.name}
+																value={`${repo.owner.login}/${repo.name}`}
 																key={repo.url}
 																onSelect={() => {
 																	form.setValue("repository", {
@@ -289,8 +294,8 @@ export const SaveGithubProvider = ({ applicationId }: Props) => {
 																	form.setValue("branch", "");
 																}}
 															>
-																<span className="flex items-center gap-2">
-																	<span>{repo.name}</span>
+																<span className="flex min-w-0 items-center gap-2">
+																	<span className="truncate">{repo.name}</span>
 																	<span className="text-muted-foreground text-xs">
 																		{repo.owner.login}
 																	</span>
@@ -298,7 +303,8 @@ export const SaveGithubProvider = ({ applicationId }: Props) => {
 																<CheckIcon
 																	className={cn(
 																		"ml-auto h-4 w-4",
-																		repo.name === field.value.repo
+																		repo.name === field.value.repo &&
+																			repo.owner.login === field.value.owner
 																			? "opacity-100"
 																			: "opacity-0",
 																	)}
@@ -345,7 +351,10 @@ export const SaveGithubProvider = ({ applicationId }: Props) => {
 												</Button>
 											</FormControl>
 										</PopoverTrigger>
-										<PopoverContent className="p-0" align="start">
+										<PopoverContent
+											className="w-[var(--radix-popover-trigger-width)] p-0"
+											align="start"
+										>
 											<Command>
 												<CommandInput
 													placeholder="Search branch..."
@@ -373,7 +382,7 @@ export const SaveGithubProvider = ({ applicationId }: Props) => {
 																	form.setValue("branch", branch.name);
 																}}
 															>
-																{branch.name}
+																<span className="truncate">{branch.name}</span>
 																<CheckIcon
 																	className={cn(
 																		"ml-auto h-4 w-4",
@@ -429,8 +438,12 @@ export const SaveGithubProvider = ({ applicationId }: Props) => {
 										</TooltipProvider>
 									</div>
 									<Select
-										onValueChange={field.onChange}
-										defaultValue={field.value}
+										onValueChange={(value) => {
+											if (!value) {
+												return;
+											}
+											field.onChange(value);
+										}}
 										value={field.value}
 									>
 										<FormControl>
@@ -478,14 +491,18 @@ export const SaveGithubProvider = ({ applicationId }: Props) => {
 													className="flex items-center gap-1"
 												>
 													{path}
-													<X
-														className="size-3 cursor-pointer hover:text-destructive"
+													<button
+														type="button"
+														aria-label="Remove watch path"
+														className="inline-flex items-center focus-visible:ring-2"
 														onClick={() => {
 															const newPaths = [...(field.value || [])];
 															newPaths.splice(index, 1);
 															field.onChange(newPaths);
 														}}
-													/>
+													>
+														<X className="size-3 cursor-pointer hover:text-destructive" />
+													</button>
 												</Badge>
 											))}
 										</div>
@@ -534,14 +551,14 @@ export const SaveGithubProvider = ({ applicationId }: Props) => {
 							control={form.control}
 							name="enableSubmodules"
 							render={({ field }) => (
-								<FormItem className="flex items-center space-x-2">
+								<FormItem className="flex flex-row items-center space-x-2 space-y-0">
 									<FormControl>
 										<Switch
 											checked={field.value}
 											onCheckedChange={field.onChange}
 										/>
 									</FormControl>
-									<FormLabel className="mt-0!">Enable Submodules</FormLabel>
+									<FormLabel>Enable Submodules</FormLabel>
 								</FormItem>
 							)}
 						/>

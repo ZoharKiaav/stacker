@@ -1,5 +1,5 @@
-import { Tooltip as TooltipPrimitive } from "radix-ui";
 import { Ban, CheckCircle2, RefreshCcw, Rocket, Terminal } from "lucide-react";
+import { Tooltip as TooltipPrimitive } from "radix-ui";
 import { useState } from "react";
 import { toast } from "sonner";
 import { DialogAction } from "@/components/shared/dialog-action";
@@ -229,6 +229,7 @@ export const ShowGeneralRedis = ({ redisId }: Props) => {
 						</TooltipProvider>
 						<DockerTerminalModal
 							appName={data?.appName || ""}
+							serviceId={data?.redisId}
 							serverId={data?.serverId || ""}
 						>
 							<Button
