@@ -1,6 +1,6 @@
 <div align="center">
   <a href="https://proniit.co.za">
-    <img src="https://proniit.co.za/wp-content/uploads/2026/02/proniit-cloud-vps-managed-web-hosting-logo-250.png" alt="Open Source Alternative to Vercel, Netlify and Heroku. built on Dokploy for VPStack™ Deployment." width="100%"  />
+    <img src="https://proniit.com/logo.svg" alt="Open Source Alternative to Vercel, Netlify and Heroku. built on Dokploy for VPStack™ Deployment." width="100%"  />
   </a>
   </br>
 </div>
@@ -130,7 +130,7 @@ Want to help shape VPStacks, test templates, or contribute docs and examples? Op
 ### Quick links 🔗
 
 - GitHub: https://github.com/ZoharKiaav/stacker  
-- Proniit: https://proniit.co.za
+- Proniit: https://proniit.co.za \ https://proniit.com
 
 ---
 
