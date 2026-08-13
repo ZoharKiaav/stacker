@@ -1,6 +1,6 @@
 <div align="center">
   <a href="https://proniit.co.za">
-    <img src="https://proniit.com/logo.svg" alt="Open Source Alternative to Vercel, Netlify and Heroku. built on Dokploy for VPStack™ Deployment." width="100%"  />
+    <img src="https://proniit.com/logo-header.png" alt="Open Source Alternative to Vercel, Netlify and Heroku. built on Dokploy for VPStack™ Deployment." width="100%"  />
   </a>
   </br>
 </div>
