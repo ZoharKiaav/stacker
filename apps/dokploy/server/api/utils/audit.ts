@@ -1,5 +1,8 @@
-import type { AuditAction, AuditResourceType } from "@dokploy/server/db/schema";
-import { createAuditLog } from "@dokploy/server/services/proprietary/audit-log";
+﻿import type {
+	VkloudAuditAction,
+	VkloudAuditResourceType,
+} from "@dokploy/server/services/vkloud/audit";
+import { createVkloudAuditEvent } from "@dokploy/server/services/vkloud/audit";
 
 interface AuditCtx {
 	user: { id: string; email: string; role: string };
@@ -7,25 +10,20 @@ interface AuditCtx {
 }
 
 interface AuditEvent {
-	action: AuditAction;
-	resourceType: AuditResourceType;
+	action: VkloudAuditAction;
+	resourceType: VkloudAuditResourceType;
 	resourceId?: string;
 	resourceName?: string;
 	metadata?: Record<string, unknown>;
 }
 
-/**
- * Creates an audit log entry from a tRPC context.
- * Extracts userId, userEmail, userRole and organizationId automatically.
- *
- * Usage:
- *   await audit(ctx, { action: "create", resourceType: "project", resourceName: "my-app" });
- */
 export const audit = (ctx: AuditCtx, event: AuditEvent) =>
-	createAuditLog({
+	createVkloudAuditEvent({
 		organizationId: ctx.session.activeOrganizationId,
-		userId: ctx.user.id,
-		userEmail: ctx.user.email,
-		userRole: ctx.user.role,
+		actor: {
+			userId: ctx.user.id,
+			email: ctx.user.email,
+			role: ctx.user.role,
+		},
 		...event,
 	});

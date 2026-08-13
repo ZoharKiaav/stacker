@@ -1,4 +1,4 @@
-import type { IncomingMessage } from "node:http";
+﻿import type { IncomingMessage } from "node:http";
 import { apiKey } from "@better-auth/api-key";
 import { scim } from "@better-auth/scim";
 import { sso } from "@better-auth/sso";
@@ -16,7 +16,7 @@ import {
 	getTrustedProviders,
 	getUserByToken,
 } from "../services/admin";
-import { createAuditLog } from "../services/proprietary/audit-log";
+import { createVkloudAuditEvent } from "../services/vkloud/audit";
 import {
 	getWebServerSettings,
 	updateWebServerSettings,
@@ -335,11 +335,13 @@ const createBetterAuth = () =>
 							with: { user: true },
 						});
 						if (!memberRecord) return;
-						await createAuditLog({
+						await createVkloudAuditEvent({
 							organizationId: orgId,
-							userId: session.userId,
-							userEmail: memberRecord.user.email,
-							userRole: memberRecord.role,
+							actor: {
+								userId: session.userId,
+								email: memberRecord.user.email,
+								role: memberRecord.role,
+							},
 							action: "login",
 							resourceType: "session",
 						});
@@ -359,11 +361,13 @@ const createBetterAuth = () =>
 							with: { user: true },
 						});
 						if (!memberRecord) return;
-						await createAuditLog({
+						await createVkloudAuditEvent({
 							organizationId: orgId,
-							userId: session.userId,
-							userEmail: memberRecord.user.email,
-							userRole: memberRecord.role,
+							actor: {
+								userId: session.userId,
+								email: memberRecord.user.email,
+								role: memberRecord.role,
+							},
 							action: "logout",
 							resourceType: "session",
 						});
@@ -458,7 +462,7 @@ const createBetterAuth = () =>
 		],
 	});
 
-// Una sola instancia de better-auth por proceso aunque el módulo esté
+// Una sola instancia de better-auth por proceso aunque el mÃ³dulo estÃ©
 // duplicado en varios bundles.
 const globalForAuth = globalThis as unknown as {
 	betterAuthInstance?: ReturnType<typeof createBetterAuth>;
