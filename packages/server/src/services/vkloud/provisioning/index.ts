@@ -10,3 +10,4 @@ export * from "./outcome-decisions";
 export * from "./outcome-persistence";
 export * from "./persistence";
 export * from "./response";
+export * from "./vpay-auth";
