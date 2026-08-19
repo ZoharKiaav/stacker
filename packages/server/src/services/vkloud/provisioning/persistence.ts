@@ -387,3 +387,14 @@ export const operationCreatesLifecycleState = (
 	operation === "suspend" ||
 	operation === "unsuspend" ||
 	operation === "terminate";
+
+export const findProvisioningOperationByIdempotencyKey = async (
+	organizationId: string,
+	idempotencyKey: string,
+) =>
+	await db.query.vkloudProvisioningOperation.findFirst({
+		where: and(
+			eq(vkloudProvisioningOperation.organizationId, organizationId),
+			eq(vkloudProvisioningOperation.idempotencyKey, idempotencyKey),
+		),
+	});
