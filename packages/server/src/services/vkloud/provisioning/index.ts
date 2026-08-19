@@ -5,5 +5,8 @@ export * from "./idempotency";
 export * from "./lifecycle";
 export * from "./orchestration";
 export * from "./orchestration-decisions";
+export * from "./outcome";
+export * from "./outcome-decisions";
+export * from "./outcome-persistence";
 export * from "./persistence";
 export * from "./response";
