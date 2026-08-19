@@ -23,6 +23,14 @@ const serviceStatusInput = z.object({
 
 export const vkloudProvisioningRouter = createTRPCRouter({
 	accept: vpayProcedure
+		.meta({
+			openapi: {
+				enabled: true,
+				method: "POST",
+				path: "/vkloud/provisioning/v1/accept",
+				override: true,
+			},
+		})
 		.input(provisioningRequestSchema)
 		.output(provisioningResponseSchema)
 		.mutation(async ({ input, ctx }) => {
@@ -50,6 +58,14 @@ export const vkloudProvisioningRouter = createTRPCRouter({
 		}),
 
 	operationStatus: vpayProcedure
+		.meta({
+			openapi: {
+				enabled: true,
+				method: "GET",
+				path: "/vkloud/provisioning/v1/operations/{operationId}",
+				override: true,
+			},
+		})
 		.input(operationStatusInput)
 		.output(provisioningResponseSchema)
 		.query(async ({ input, ctx }) => {
@@ -65,6 +81,14 @@ export const vkloudProvisioningRouter = createTRPCRouter({
 		}),
 
 	serviceStatus: vpayProcedure
+		.meta({
+			openapi: {
+				enabled: true,
+				method: "GET",
+				path: "/vkloud/provisioning/v1/services/{billingServiceId}",
+				override: true,
+			},
+		})
 		.input(serviceStatusInput)
 		.output(provisioningServiceStatusSchema)
 		.query(async ({ input, ctx }) => {
