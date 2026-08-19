@@ -6,6 +6,8 @@ export * from "./execution-dispatch";
 export * from "./execution-dispatch-decisions";
 export * from "./execution-dispatch-plan";
 export * from "./execution-planner";
+export * from "./execution-target";
+export * from "./execution-target-resolver";
 export * from "./idempotency";
 export * from "./lifecycle";
 export * from "./orchestration";
