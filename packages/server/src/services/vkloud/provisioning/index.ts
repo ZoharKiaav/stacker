@@ -11,3 +11,5 @@ export * from "./outcome-persistence";
 export * from "./persistence";
 export * from "./response";
 export * from "./vpay-auth";
+export * from "./vpay-key";
+export * from "./vpay-key-metadata";

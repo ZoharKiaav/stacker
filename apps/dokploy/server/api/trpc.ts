@@ -230,3 +230,36 @@ export const withPermission = <R extends Resource>(
 
 		return next();
 	});
+export const sessionAdminProcedure = t.procedure.use(({ ctx, next }) => {
+	if (!ctx.session || !ctx.user) {
+		throw new TRPCError({ code: "UNAUTHORIZED" });
+	}
+
+	if (ctx.authentication?.source !== "session") {
+		throw new TRPCError({
+			code: "FORBIDDEN",
+			message: "Browser-session authentication required",
+		});
+	}
+	if (ctx.user.role !== "owner" && ctx.user.role !== "admin") {
+		throw new TRPCError({
+			code: "FORBIDDEN",
+			message: "Owner or administrator access required",
+		});
+	}
+
+	if (!ctx.session.activeOrganizationId) {
+		throw new TRPCError({
+			code: "FORBIDDEN",
+			message: "Active organization required",
+		});
+	}
+
+	return next({
+		ctx: {
+			session: ctx.session,
+			user: ctx.user,
+			authentication: ctx.authentication,
+		},
+	});
+});

@@ -55,6 +55,7 @@ import { tagRouter } from "./routers/tag";
 import { userRouter } from "./routers/user";
 import { vaultProviderRouter } from "./routers/vault-provider";
 import { auditLogRouter } from "./routers/vkloud/audit-log";
+import { vkloudProvisioningKeyRouter } from "./routers/vkloud/provisioning-key";
 import { volumeBackupsRouter } from "./routers/volume-backups";
 /**
  * This is the primary router for your server.
@@ -113,6 +114,7 @@ export const appRouter = createTRPCRouter({
 	whitelabeling: whitelabelingRouter,
 	customRole: customRoleRouter,
 	auditLog: auditLogRouter,
+	vkloudProvisioningKey: vkloudProvisioningKeyRouter,
 	schedule: scheduleRouter,
 	rollback: rollbackRouter,
 	volumeBackups: volumeBackupsRouter,
