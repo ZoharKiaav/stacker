@@ -16,6 +16,7 @@ export * from "./execution-target-ownership";
 export * from "./execution-target-resolver";
 export * from "./execution-target-validation";
 export * from "./idempotency";
+export * from "./immutable-template-artifact";
 export * from "./lifecycle";
 export * from "./orchestration";
 export * from "./orchestration-decisions";
