@@ -10,6 +10,8 @@ export * from "./execution-readiness";
 export * from "./execution-readiness-builder";
 export * from "./execution-readiness-service";
 export * from "./execution-target";
+export * from "./execution-target-catalogue-loader";
+export * from "./execution-target-catalogue-row";
 export * from "./execution-target-ownership";
 export * from "./execution-target-resolver";
 export * from "./execution-target-validation";
