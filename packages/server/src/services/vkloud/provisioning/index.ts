@@ -15,6 +15,7 @@ export * from "./execution-target-catalogue-row";
 export * from "./execution-target-ownership";
 export * from "./execution-target-resolver";
 export * from "./execution-target-validation";
+export * from "./first-compose-record";
 export * from "./idempotency";
 export * from "./immutable-template-artifact";
 export * from "./lifecycle";
