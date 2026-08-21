@@ -31,3 +31,4 @@ export * from "./status-response";
 export * from "./vpay-auth";
 export * from "./vpay-key";
 export * from "./vpay-key-metadata";
+export * from "./vpstack-compose-authorization";
