@@ -1,6 +1,7 @@
 import {
-	dispatchProvisioningOperationDryRun,
-	provisioningExecutionPlanSchema,
+	evaluateProvisioningExecutionReadiness,
+	executionReadinessSchema,
+	loadExecutionTargetCatalogue,
 } from "@dokploy/server";
 import { z } from "zod";
 import { createTRPCRouter, sessionAdminProcedure } from "../../trpc";
@@ -12,11 +13,16 @@ const previewExecutionInput = z.object({
 export const vkloudExecutionPreviewRouter = createTRPCRouter({
 	operation: sessionAdminProcedure
 		.input(previewExecutionInput)
-		.output(provisioningExecutionPlanSchema)
-		.query(async ({ input, ctx }) =>
-			dispatchProvisioningOperationDryRun(
-				ctx.session.activeOrganizationId,
+		.output(executionReadinessSchema)
+		.query(async ({ input, ctx }) => {
+			const organizationId = ctx.session.activeOrganizationId;
+
+			const targets = await loadExecutionTargetCatalogue(organizationId);
+
+			return evaluateProvisioningExecutionReadiness(
+				organizationId,
 				input.operationId,
-			),
-		),
+				targets,
+			);
+		}),
 });
