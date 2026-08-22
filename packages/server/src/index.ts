@@ -56,6 +56,7 @@ export * from "./services/settings";
 export * from "./services/ssh-key";
 export * from "./services/user";
 export * from "./services/vault-provider";
+export * from "./services/vkloud/provisioning";
 export * from "./services/volume-backups";
 export * from "./services/web-server-settings";
 export * from "./setup/config-paths";

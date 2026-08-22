@@ -514,99 +514,109 @@ export const auth: AuthType = _auth;
 
 export const validateRequest = async (request: IncomingMessage) => {
 	const apiKey = request.headers["x-api-key"] as string;
+
 	if (apiKey) {
 		try {
 			const { valid, key, error } = await api.verifyApiKey({
-				body: {
-					key: apiKey,
-				},
+				body: { key: apiKey },
 			});
 
 			if (error) {
 				throw new Error(error.message?.toString() || "Error verifying API key");
 			}
+
 			if (!valid || !key) {
 				return {
 					session: null,
 					user: null,
+					authentication: null,
 				};
 			}
 
 			const apiKeyRecord = await db.query.apikey.findFirst({
 				where: eq(schema.apikey.id, key.id),
-				with: {
-					user: true,
-				},
+				with: { user: true },
 			});
 
 			if (!apiKeyRecord) {
 				return {
 					session: null,
 					user: null,
+					authentication: null,
 				};
 			}
 
-			const organizationId = (
-				JSON.parse(apiKeyRecord.metadata || "{}") as {
-					organizationId?: string;
-				}
-			).organizationId;
+			const metadata = JSON.parse(apiKeyRecord.metadata || "{}") as {
+				organizationId?: string;
+				purpose?: string;
+			};
 
-			if (!organizationId) {
+			if (!metadata.organizationId) {
 				return {
 					session: null,
 					user: null,
+					authentication: null,
 				};
 			}
 
 			const member = await db.query.member.findFirst({
 				where: and(
 					eq(schema.member.userId, apiKeyRecord.user.id),
-					eq(schema.member.organizationId, organizationId),
+					eq(schema.member.organizationId, metadata.organizationId),
 				),
-				with: {
-					organization: true,
-				},
+				with: { organization: true },
 			});
 
-			// When accessing from DB, use actual column names
+			if (!member) {
+				return {
+					session: null,
+					user: null,
+					authentication: null,
+				};
+			}
+
 			const userFromDb = apiKeyRecord.user as typeof apiKeyRecord.user & {
 				firstName: string;
 				lastName: string;
 			};
 
-			const mockSession = {
+			return {
 				session: {
 					userId: apiKeyRecord.user.id,
-					activeOrganizationId: organizationId || "",
+					activeOrganizationId: metadata.organizationId,
 				},
 				user: {
 					id: userFromDb.id,
-					name: userFromDb.firstName, // Map firstName back to name for better-auth
+					name: userFromDb.firstName,
 					email: userFromDb.email,
 					emailVerified: userFromDb.emailVerified,
 					image: userFromDb.image,
 					createdAt: userFromDb.createdAt,
 					updatedAt: userFromDb.updatedAt,
 					twoFactorEnabled: userFromDb.twoFactorEnabled,
-					role: member?.role || "member",
-					ownerId: member?.organization.ownerId || apiKeyRecord.user.id,
+					role: member.role,
+					ownerId: member.organization.ownerId,
 					enableEnterpriseFeatures: userFromDb.enableEnterpriseFeatures,
 					isValidEnterpriseLicense: userFromDb.isValidEnterpriseLicense,
 				},
+				authentication: {
+					source: "api_key" as const,
+					apiKeyId: apiKeyRecord.id,
+					organizationId: metadata.organizationId,
+					purpose: metadata.purpose,
+				},
 			};
-
-			return mockSession;
 		} catch (error) {
 			console.error("Error verifying API key", error);
+
 			return {
 				session: null,
 				user: null,
+				authentication: null,
 			};
 		}
 	}
 
-	// If no API key, proceed with normal session validation
 	const session = await api.getSession({
 		headers: new Headers({
 			cookie: request.headers.cookie || "",
@@ -617,41 +627,41 @@ export const validateRequest = async (request: IncomingMessage) => {
 		return {
 			session: null,
 			user: null,
+			authentication: null,
 		};
 	}
 
-	if (session?.user) {
-		const member = await db.query.member.findFirst({
-			where: and(
-				eq(schema.member.userId, session.user.id),
-				...(session.session.activeOrganizationId
-					? [
-							eq(
-								schema.member.organizationId,
-								session.session.activeOrganizationId || "",
-							),
-						]
-					: []),
-			),
-			orderBy: [desc(schema.member.isDefault), desc(schema.member.createdAt)],
-			with: {
-				organization: true,
-				user: true,
-			},
-		});
+	const member = await db.query.member.findFirst({
+		where: and(
+			eq(schema.member.userId, session.user.id),
+			...(session.session.activeOrganizationId
+				? [
+						eq(
+							schema.member.organizationId,
+							session.session.activeOrganizationId,
+						),
+					]
+				: []),
+		),
+		orderBy: [desc(schema.member.isDefault), desc(schema.member.createdAt)],
+		with: {
+			organization: true,
+			user: true,
+		},
+	});
 
-		session.user.role = member?.role || "member";
-		session.user.enableEnterpriseFeatures =
-			member?.user.enableEnterpriseFeatures || false;
-		session.user.isValidEnterpriseLicense =
-			member?.user.isValidEnterpriseLicense || false;
-		session.session.activeOrganizationId = member?.organization.id || "";
-		if (member) {
-			session.user.ownerId = member.organization.ownerId;
-		} else {
-			session.user.ownerId = session.user.id;
-		}
-	}
+	session.user.role = member?.role || "member";
+	session.user.enableEnterpriseFeatures =
+		member?.user.enableEnterpriseFeatures || false;
+	session.user.isValidEnterpriseLicense =
+		member?.user.isValidEnterpriseLicense || false;
+	session.session.activeOrganizationId = member?.organization.id || "";
+	session.user.ownerId = member?.organization.ownerId || session.user.id;
 
-	return session;
+	return {
+		...session,
+		authentication: {
+			source: "session" as const,
+		},
+	};
 };
