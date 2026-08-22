@@ -34,3 +34,4 @@ export * from "./vpay-auth";
 export * from "./vpay-key";
 export * from "./vpay-key-metadata";
 export * from "./vpstack-compose-authorization";
+export * from "./first-compose-record-execution";
