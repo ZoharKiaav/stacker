@@ -1,4 +1,4 @@
-﻿import { createTRPCRouter } from "../api/trpc";
+import { createTRPCRouter } from "../api/trpc";
 import { adminRouter } from "./routers/admin";
 import { aiRouter } from "./routers/ai";
 import { applicationRouter } from "./routers/application";
@@ -56,6 +56,7 @@ import { userRouter } from "./routers/user";
 import { vaultProviderRouter } from "./routers/vault-provider";
 import { auditLogRouter } from "./routers/vkloud/audit-log";
 import { vkloudExecutionPreviewRouter } from "./routers/vkloud/execution-preview";
+import { vkloudExecutionRunRouter } from "./routers/vkloud/execution-run";
 import { vkloudProvisioningRouter } from "./routers/vkloud/provisioning";
 import { vkloudProvisioningKeyRouter } from "./routers/vkloud/provisioning-key";
 import { volumeBackupsRouter } from "./routers/volume-backups";
@@ -119,6 +120,7 @@ export const appRouter = createTRPCRouter({
 	vkloudProvisioning: vkloudProvisioningRouter,
 	vkloudProvisioningKey: vkloudProvisioningKeyRouter,
 	vkloudExecutionPreview: vkloudExecutionPreviewRouter,
+	vkloudExecutionRun: vkloudExecutionRunRouter,
 	schedule: scheduleRouter,
 	rollback: rollbackRouter,
 	volumeBackups: volumeBackupsRouter,
