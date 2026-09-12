@@ -10,6 +10,7 @@ import {
 } from "@dokploy/server";
 import { z } from "zod";
 import { createTRPCRouter, vpayProcedure } from "../../trpc";
+import { executeAcceptedProvisioningOperation } from "./automatic-execution";
 
 const TARGET_POLICY = "managed-default";
 
@@ -50,11 +51,30 @@ export const vkloudProvisioningRouter = createTRPCRouter({
 				accepted.operation.id,
 			);
 
-			return buildProvisioningStatusResponse({
+			const response = buildProvisioningStatusResponse({
 				operation: current,
 				mapping: current.billingService,
 				duplicate: accepted.duplicate,
 			});
+
+			if (!accepted.duplicate) {
+				void executeAcceptedProvisioningOperation({
+					organizationId:
+						ctx.session.activeOrganizationId,
+					operationId: accepted.operation.id,
+				}).catch((error) => {
+					console.error(
+						"Automatic vKloud provisioning execution failed",
+						{
+							operationId:
+								accepted.operation.id,
+							error,
+						},
+					);
+				});
+			}
+
+			return response;
 		}),
 
 	operationStatus: vpayProcedure
