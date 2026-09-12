@@ -305,7 +305,7 @@ export const deployCompose = async ({
 			command += `echo "${encodedMessage}" | base64 -d >> "${deployment.logPath}";`;
 		}
 
-		command += `echo "\nError occurred ❌, check the logs for details." >> ${deployment.logPath};`;
+		command += `echo "\nError occurred âŒ, check the logs for details." >> ${deployment.logPath};`;
 		if (compose.serverId) {
 			await execAsyncRemote(compose.serverId, command);
 		} else {
@@ -409,7 +409,7 @@ export const rebuildCompose = async ({
 			command += `echo "${encodedMessage}" | base64 -d >> "${deployment.logPath}";`;
 		}
 
-		command += `echo "\nError occurred ❌, check the logs for details." >> ${deployment.logPath};`;
+		command += `echo "\nError occurred âŒ, check the logs for details." >> ${deployment.logPath};`;
 		if (compose.serverId) {
 			await execAsyncRemote(compose.serverId, command);
 		} else {
