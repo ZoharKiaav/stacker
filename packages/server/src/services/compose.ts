@@ -44,6 +44,7 @@ import {
 } from "./deployment";
 import { generateApplyPatchesCommand } from "./patch";
 import { validUniqueServerAppName } from "./project";
+import { completeComposeProvisioningOutcome } from "./vkloud/provisioning/compose-provisioning-outcome";
 
 export type Compose = typeof compose.$inferSelect;
 
@@ -286,6 +287,19 @@ export const deployCompose = async ({
 			composeStatus: "done",
 		});
 
+		try {
+			await completeComposeProvisioningOutcome({
+				composeId,
+				outcome: "succeeded",
+				supportReference: deployment.deploymentId,
+			});
+		} catch (completionError) {
+			console.error(
+				"Failed to complete successful vKloud Compose provisioning outcome",
+				completionError,
+			);
+		}
+
 		await sendBuildSuccessNotifications({
 			projectName: compose.environment.project.name,
 			applicationName: compose.name,
@@ -315,6 +329,19 @@ export const deployCompose = async ({
 		await updateCompose(composeId, {
 			composeStatus: "error",
 		});
+
+		try {
+			await completeComposeProvisioningOutcome({
+				composeId,
+				outcome: "failed",
+				supportReference: deployment.deploymentId,
+			});
+		} catch (completionError) {
+			console.error(
+				"Failed to complete failed vKloud Compose provisioning outcome",
+				completionError,
+			);
+		}
 		await sendBuildErrorNotifications({
 			projectName: compose.environment.project.name,
 			applicationName: compose.name,
