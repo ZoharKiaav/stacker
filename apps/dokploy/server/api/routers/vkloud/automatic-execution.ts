@@ -72,6 +72,8 @@ export const executeAcceptedProvisioningOperation = async ({
                         {
                                 metadata:
                                         fetched.config.metadata,
+                                access:
+                                        fetched.config.access,
                                 dockerCompose:
                                         fetched.dockerCompose,
                         },

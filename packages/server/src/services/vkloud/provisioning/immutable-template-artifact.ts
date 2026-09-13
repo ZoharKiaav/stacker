@@ -10,6 +10,17 @@ const templateIdentitySchema = z
 	})
 	.strict();
 
+export const templateAccessSchema = z
+	.object({
+		serviceName: z.string().trim().min(1).max(255),
+		port: z.number().int().min(1).max(65535),
+		path: z.string().trim().min(1).default("/"),
+		internalPath: z.string().trim().min(1).default("/"),
+	})
+	.strict();
+
+export type TemplateAccess = z.infer<typeof templateAccessSchema>;
+
 const fetchedTemplateSchema = z
 	.object({
 		metadata: z
@@ -18,6 +29,7 @@ const fetchedTemplateSchema = z
 				version: z.string().trim().min(1),
 			})
 			.passthrough(),
+		access: templateAccessSchema,
 		dockerCompose: z.string().trim().min(1),
 	})
 	.strict();
@@ -27,6 +39,7 @@ export const immutableTemplateArtifactSchema = z
 		templateId: z.string().min(1),
 		templateVersion: z.string().min(1),
 		baseUrl: z.url(),
+		access: templateAccessSchema,
 		dockerCompose: z.string().min(1),
 		contentDigest: z.string().regex(/^[a-f0-9]{64}$/),
 	})
@@ -57,11 +70,17 @@ export const verifyImmutableTemplateArtifact = (
 		});
 	}
 
+	const access = templateAccessSchema.parse(actual.access);
+
+	const digestInput = JSON.stringify({
+		dockerCompose: actual.dockerCompose,
+		access,
+	});
+
 	return immutableTemplateArtifactSchema.parse({
 		...expected,
+		access,
 		dockerCompose: actual.dockerCompose,
-		contentDigest: createHash("sha256")
-			.update(actual.dockerCompose)
-			.digest("hex"),
+		contentDigest: createHash("sha256").update(digestInput).digest("hex"),
 	});
 };

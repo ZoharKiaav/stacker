@@ -71,6 +71,7 @@ export const vkloudExecutionRunRouter = createTRPCRouter({
 				},
 				{
 					metadata: fetched.config.metadata,
+					access: fetched.config.access,
 					dockerCompose: fetched.dockerCompose,
 				},
 			);

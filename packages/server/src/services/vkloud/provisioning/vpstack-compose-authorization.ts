@@ -20,6 +20,12 @@ export interface AuthorizedVpstackComposeIntent {
 	operationId: string;
 	billingServiceMappingId: string;
 	contentDigest: string;
+	access: {
+		serviceName: string;
+		port: number;
+		path: string;
+		internalPath: string;
+	};
 	compose: {
 		name: string;
 		description: string;
@@ -123,6 +129,7 @@ export const authorizeVpstackComposeIntent = ({
 		operationId: readiness.plan.operationId,
 		billingServiceMappingId: readiness.plan.billingServiceMappingId,
 		contentDigest: artifact.contentDigest,
+		access: artifact.access,
 		compose: {
 			name: readiness.plan.templateId,
 			description: "Disposable local VPStack provisioning test",

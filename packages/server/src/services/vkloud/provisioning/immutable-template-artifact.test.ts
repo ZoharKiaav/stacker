@@ -14,6 +14,12 @@ const fetched = {
 		version: "1.0.0",
 		name: "Client Operations",
 	},
+	access: {
+		serviceName: "web",
+		port: 80,
+		path: "/",
+		internalPath: "/",
+	},
 	dockerCompose: "services:\n  app:\n    image: example/app:1.0.0\n",
 };
 
@@ -80,5 +86,31 @@ describe("immutable template artifact", () => {
 				fetched,
 			),
 		);
+	});
+
+	it("rejects invalid access metadata", () => {
+		assert.throws(() =>
+			verifyImmutableTemplateArtifact(identity, {
+				...fetched,
+				access: {
+					...fetched.access,
+					port: 0,
+				},
+			}),
+		);
+	});
+
+	it("changes the digest when access metadata changes", () => {
+		const original = verifyImmutableTemplateArtifact(identity, fetched);
+
+		const changed = verifyImmutableTemplateArtifact(identity, {
+			...fetched,
+			access: {
+				...fetched.access,
+				port: 8080,
+			},
+		});
+
+		assert.notEqual(original.contentDigest, changed.contentDigest);
 	});
 });

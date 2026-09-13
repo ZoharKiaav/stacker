@@ -17,6 +17,12 @@ export interface CompleteTemplate {
 			docs?: string;
 		};
 	};
+	access: {
+		serviceName: string;
+		port: number;
+		path?: string;
+		internalPath?: string;
+	};
 	variables: {
 		[key: string]: string;
 	};

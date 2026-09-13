@@ -12,6 +12,12 @@ const intent: AuthorizedVpstackComposeIntent = {
 	billingServiceMappingId: "y7Hd5welUMIp1TULx8kWL",
 	contentDigest:
 		"58f44c4f77525ce2c481e00556a5d292d823ebef18a7eee7c02a5d3dd21fc5e6",
+	access: {
+		serviceName: "web",
+		port: 80,
+		path: "/",
+		internalPath: "/",
+	},
 	compose: {
 		name: "clientops-starter",
 		description: "Disposable local VPStack provisioning test",

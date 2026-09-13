@@ -39,6 +39,12 @@ const artifact: ImmutableTemplateArtifact = {
 	templateId: "clientops-starter",
 	templateVersion: "1.0.0",
 	baseUrl: "https://templates.vkloud.example/releases/1.0.0",
+	access: {
+		serviceName: "web",
+		port: 80,
+		path: "/",
+		internalPath: "/",
+	},
 	dockerCompose: "services:\n  app:\n    image: example/app:1.0.0\n",
 	contentDigest:
 		"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
