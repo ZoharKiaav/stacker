@@ -25,6 +25,7 @@ const target = {
 	serverId: "server-7",
 	templateId: "clientops-starter",
 	templateVersion: "1.0.0",
+	baseUrl: "https://templates.vkloud.example/releases/1.0.0",
 };
 
 describe("provisioning execution readiness", () => {
@@ -35,6 +36,10 @@ describe("provisioning execution readiness", () => {
 		assert.equal(readiness.target.environmentId, "environment-7");
 		assert.equal(readiness.target.serverId, "server-7");
 		assert.equal(readiness.plan.mode, "dry_run");
+		assert.equal(
+			readiness.target.templateSource.baseUrl,
+			"https://templates.vkloud.example/releases/1.0.0",
+		);
 	});
 
 	it("rejects readiness when the target policy is absent", () => {
@@ -57,16 +62,24 @@ describe("provisioning execution readiness", () => {
 		);
 	});
 
-	it("rejects readiness for another template version", () => {
-		assert.throws(
-			() =>
-				buildExecutionReadiness(plan, [
-					{
-						...target,
-						templateVersion: "2.0.0",
-					},
-				]),
-			(error) => error instanceof TRPCError && error.code === "CONFLICT",
+	it("derives readiness for another immutable version in the trusted registry family", () => {
+		const readiness = buildExecutionReadiness(
+			{
+				...plan,
+				templateVersion: "1.0.2",
+			},
+			[target],
+		);
+
+		assert.equal(readiness.ready, true);
+		assert.equal(
+			readiness.target.templateSource.templateId,
+			"clientops-starter",
+		);
+		assert.equal(readiness.target.templateSource.templateVersion, "1.0.2");
+		assert.equal(
+			readiness.target.templateSource.baseUrl,
+			"https://templates.vkloud.example/releases/1.0.2",
 		);
 	});
 });

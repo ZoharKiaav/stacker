@@ -25,6 +25,7 @@ const definition = {
 	serverId: "server-7",
 	templateId: "clientops-starter",
 	templateVersion: "1.0.0",
+	baseUrl: "https://templates.vkloud.example/releases/1.0.0",
 };
 
 describe("provisioning execution target resolution", () => {
@@ -37,6 +38,10 @@ describe("provisioning execution target resolution", () => {
 		assert.equal(target.environmentId, "environment-7");
 		assert.equal(target.serverId, "server-7");
 		assert.equal(target.policy, "managed-default");
+		assert.equal(
+			target.templateSource.baseUrl,
+			"https://templates.vkloud.example/releases/1.0.0",
+		);
 	});
 
 	it("supports the local server when no server ID is configured", () => {
@@ -73,17 +78,20 @@ describe("provisioning execution target resolution", () => {
 		);
 	});
 
-	it("rejects a different template version", () => {
+	it("derives the requested immutable release from the trusted registry family", () => {
 		const resolver = new ExecutionTargetResolver();
+		resolver.register(definition);
 
-		resolver.register({
-			...definition,
-			templateVersion: "2.0.0",
+		const target = resolver.resolve({
+			...plan,
+			templateVersion: "1.0.2",
 		});
 
-		assert.throws(
-			() => resolver.resolve(plan),
-			(error) => error instanceof TRPCError && error.code === "CONFLICT",
+		assert.equal(target.templateSource.templateId, "clientops-starter");
+		assert.equal(target.templateSource.templateVersion, "1.0.2");
+		assert.equal(
+			target.templateSource.baseUrl,
+			"https://templates.vkloud.example/releases/1.0.2",
 		);
 	});
 

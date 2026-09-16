@@ -5,6 +5,7 @@ import {
 	type ExecutionTargetDefinition,
 	executionTargetSchema,
 } from "./execution-target";
+import { deriveTrustedTemplateReleaseUrl } from "./trusted-template-release-url";
 
 export class ExecutionTargetResolver {
 	private readonly targets = new Map<string, ExecutionTargetDefinition>();
@@ -37,26 +38,20 @@ export class ExecutionTargetResolver {
 			});
 		}
 
-		if (
-			definition.templateId !== plan.templateId ||
-			definition.templateVersion !== plan.templateVersion
-		) {
-			throw new TRPCError({
-				code: "CONFLICT",
-				message:
-					"Execution target does not match the requested template version",
-			});
-		}
-
 		return executionTargetSchema.parse({
 			policy: definition.policy,
 			adapter: definition.adapter,
 			environmentId: definition.environmentId,
 			serverId: definition.serverId ?? null,
 			templateSource: {
-				templateId: definition.templateId,
-				templateVersion: definition.templateVersion,
-				baseUrl: definition.baseUrl ?? null,
+				templateId: plan.templateId,
+				templateVersion: plan.templateVersion,
+				baseUrl: definition.baseUrl
+					? deriveTrustedTemplateReleaseUrl(
+							definition.baseUrl,
+							plan.templateVersion,
+						)
+					: null,
 			},
 		});
 	}
