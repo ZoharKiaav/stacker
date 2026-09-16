@@ -14,6 +14,8 @@ export interface FirstComposeRecordExecutionResult {
         composeId: string;
         resourceName: string;
         duplicate: boolean;
+        primaryUrl: string;
+        accessDuplicate: boolean;
         operationState: "running";
 }
 
@@ -25,6 +27,7 @@ export const executeFirstComposeRecord = async (
                         input,
                 );
 
+
         await updateProvisioningOperationState(
                 input.organizationId,
                 input.intent.operationId,
@@ -35,6 +38,8 @@ export const executeFirstComposeRecord = async (
                 composeId: created.composeId,
                 resourceName: created.resourceName,
                 duplicate: created.duplicate,
+                primaryUrl: created.primaryUrl,
+                accessDuplicate: created.accessDuplicate,
                 operationState: "running",
         };
 };

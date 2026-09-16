@@ -1,3 +1,4 @@
+export * from "./customer-access";
 export * from "./audit";
 export * from "./contract";
 export * from "./errors";

@@ -11,6 +11,11 @@ export interface CreatedComposeRecord {
 	name: string;
 }
 
+export interface EnsuredCustomerAccess {
+	primaryUrl: string;
+	duplicate: boolean;
+}
+
 export interface FirstComposeRecordStore {
 	lockBillingService(
 		organizationId: string,
@@ -25,6 +30,11 @@ export interface FirstComposeRecordStore {
 	createCompose(
 		input: AuthorizedVpstackComposeIntent["compose"],
 	): Promise<CreatedComposeRecord>;
+
+	ensureCustomerAccess(input: {
+		composeId: string;
+		intent: AuthorizedVpstackComposeIntent;
+	}): Promise<EnsuredCustomerAccess>;
 
 	registerPrimaryResource(input: {
 		organizationId: string;
@@ -44,6 +54,8 @@ export interface PersistFirstComposeRecordResult {
 	composeId: string;
 	resourceName: string;
 	duplicate: boolean;
+	primaryUrl: string;
+	accessDuplicate: boolean;
 }
 
 export const persistFirstComposeRecord = async (
@@ -61,10 +73,17 @@ export const persistFirstComposeRecord = async (
 	);
 
 	if (existing) {
+		const access = await store.ensureCustomerAccess({
+			composeId: existing.resourceId,
+			intent: input.intent,
+		});
+
 		return {
 			composeId: existing.resourceId,
 			resourceName: existing.resourceName ?? input.intent.compose.name,
 			duplicate: true,
+			primaryUrl: access.primaryUrl,
+			accessDuplicate: access.duplicate,
 		};
 	}
 
@@ -85,9 +104,16 @@ export const persistFirstComposeRecord = async (
 		resourceName: compose.name,
 	});
 
+	const access = await store.ensureCustomerAccess({
+		composeId: compose.composeId,
+		intent: input.intent,
+	});
+
 	return {
 		composeId: compose.composeId,
 		resourceName: compose.name,
 		duplicate: false,
+		primaryUrl: access.primaryUrl,
+		accessDuplicate: access.duplicate,
 	};
 };
