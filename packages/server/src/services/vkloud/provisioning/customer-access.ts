@@ -46,6 +46,15 @@ export const buildCustomerAccessPlan = (
 		});
 	}
 
+	const primaryAccess = intent.access.find((endpoint) => endpoint.primary);
+
+	if (!primaryAccess) {
+		throw new TRPCError({
+			code: "CONFLICT",
+			message: "Customer access requires one primary endpoint",
+		});
+	}
+
 	const ipLabel = ip.replaceAll(".", "-");
 	const host = `${intent.compose.appName}-${ipLabel}.sslip.io`;
 
@@ -56,12 +65,12 @@ export const buildCustomerAccessPlan = (
 			host,
 			https: false,
 			certificateType: "none",
-			path: normalisePath(intent.access.path, "Access path"),
-			port: intent.access.port,
-			serviceName: intent.access.serviceName,
+			path: normalisePath(primaryAccess.path, "Access path"),
+			port: primaryAccess.port,
+			serviceName: primaryAccess.serviceName,
 			domainType: "compose",
 			internalPath: normalisePath(
-				intent.access.internalPath,
+				primaryAccess.internalPath,
 				"Internal access path",
 			),
 			stripPath: false,

@@ -20,12 +20,7 @@ export interface AuthorizedVpstackComposeIntent {
 	operationId: string;
 	billingServiceMappingId: string;
 	contentDigest: string;
-	access: {
-		serviceName: string;
-		port: number;
-		path: string;
-		internalPath: string;
-	};
+	access: ImmutableTemplateArtifact["access"];
 	compose: {
 		name: string;
 		description: string;

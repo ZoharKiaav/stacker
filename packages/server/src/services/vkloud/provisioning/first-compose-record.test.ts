@@ -12,12 +12,26 @@ const intent: AuthorizedVpstackComposeIntent = {
 	billingServiceMappingId: "mapping-1",
 	contentDigest:
 		"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-	access: {
-		serviceName: "web",
-		port: 80,
-		path: "/",
-		internalPath: "/",
-	},
+	access: [
+		{
+			key: "website",
+			serviceName: "web",
+			port: 80,
+			path: "/",
+			internalPath: "/",
+			suggestedSubdomain: "www",
+			primary: true,
+		},
+		{
+			key: "support",
+			serviceName: "support",
+			port: 80,
+			path: "/",
+			internalPath: "/",
+			suggestedSubdomain: "support",
+			primary: false,
+		},
+	],
 	compose: {
 		name: "clientops-starter",
 		description: "Customer access test",
@@ -130,42 +144,38 @@ describe("first Compose persistence", () => {
 			"http://vpstack-0123456789abcdef-188-245-64-152.sslip.io",
 		);
 	});
-        it("does not register or ensure access when Compose creation fails", async () => {
-                const { store, calls } = createStore();
+	it("does not register or ensure access when Compose creation fails", async () => {
+		const { store, calls } = createStore();
 
-                store.createCompose = async () => {
-                        calls.push("create-compose");
+		store.createCompose = async () => {
+			calls.push("create-compose");
 
-                        throw new Error("Compose creation failed");
-                };
+			throw new Error("Compose creation failed");
+		};
 
-                await assert.rejects(
-                        () =>
-                                persistFirstComposeRecord(store, {
-                                        organizationId: "organization-1",
-                                        intent,
-                                }),
-                        /Compose creation failed/,
-                );
+		await assert.rejects(
+			() =>
+				persistFirstComposeRecord(store, {
+					organizationId: "organization-1",
+					intent,
+				}),
+			/Compose creation failed/,
+		);
 
-                assert.deepEqual(calls, [
-                        "lock",
-                        "find",
-                        "create-compose",
-                ]);
-        });
+		assert.deepEqual(calls, ["lock", "find", "create-compose"]);
+	});
 
-        it("contains no deployment or startup operation", async () => {
-                const { store } = createStore();
+	it("contains no deployment or startup operation", async () => {
+		const { store } = createStore();
 
-                const result = await persistFirstComposeRecord(store, {
-                        organizationId: "organization-1",
-                        intent,
-                });
+		const result = await persistFirstComposeRecord(store, {
+			organizationId: "organization-1",
+			intent,
+		});
 
-                const serialized = JSON.stringify(result);
+		const serialized = JSON.stringify(result);
 
-                assert.equal(serialized.includes("deployCompose"), false);
-                assert.equal(serialized.includes("startCompose"), false);
-        });
+		assert.equal(serialized.includes("deployCompose"), false);
+		assert.equal(serialized.includes("startCompose"), false);
+	});
 });

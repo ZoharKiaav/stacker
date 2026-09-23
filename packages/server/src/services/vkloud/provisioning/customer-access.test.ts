@@ -9,12 +9,26 @@ const intent: AuthorizedVpstackComposeIntent = {
 	billingServiceMappingId: "mapping-1",
 	contentDigest:
 		"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-	access: {
-		serviceName: "web",
-		port: 80,
-		path: "/",
-		internalPath: "/",
-	},
+	access: [
+		{
+			key: "support",
+			serviceName: "support",
+			port: 8080,
+			path: "/support",
+			internalPath: "/",
+			suggestedSubdomain: "support",
+			primary: false,
+		},
+		{
+			key: "website",
+			serviceName: "web",
+			port: 80,
+			path: "/",
+			internalPath: "/",
+			suggestedSubdomain: "www",
+			primary: true,
+		},
+	],
 	compose: {
 		name: "clientops-starter",
 		description: "Customer access test",
@@ -29,7 +43,6 @@ const intent: AuthorizedVpstackComposeIntent = {
 describe("VPStack customer access planning", () => {
 	it("creates a deterministic HTTP hostname", () => {
 		const first = buildCustomerAccessPlan(intent, "188.245.64.152");
-
 		const second = buildCustomerAccessPlan(intent, "188.245.64.152");
 
 		assert.deepEqual(first, second);
@@ -43,14 +56,39 @@ describe("VPStack customer access planning", () => {
 		);
 	});
 
-	it("targets the declared Compose service and port", () => {
+	it("targets the declared primary Compose service and port", () => {
 		const plan = buildCustomerAccessPlan(intent, "188.245.64.152");
 
 		assert.equal(plan.domain.serviceName, "web");
 		assert.equal(plan.domain.port, 80);
+		assert.equal(plan.domain.path, "/");
 		assert.equal(plan.domain.domainType, "compose");
 		assert.equal(plan.domain.https, false);
 		assert.equal(plan.domain.certificateType, "none");
+	});
+
+	it("does not select a non-primary endpoint", () => {
+		const plan = buildCustomerAccessPlan(intent, "188.245.64.152");
+
+		assert.notEqual(plan.domain.serviceName, "support");
+		assert.notEqual(plan.domain.port, 8080);
+	});
+
+	it("rejects access without a primary endpoint", () => {
+		assert.throws(
+			() =>
+				buildCustomerAccessPlan(
+					{
+						...intent,
+						access: intent.access.map((endpoint) => ({
+							...endpoint,
+							primary: false,
+						})),
+					},
+					"188.245.64.152",
+				),
+			/requires one primary endpoint/,
+		);
 	});
 
 	it("rejects a missing server IP", () => {
@@ -73,10 +111,14 @@ describe("VPStack customer access planning", () => {
 				buildCustomerAccessPlan(
 					{
 						...intent,
-						access: {
-							...intent.access,
-							path: "admin",
-						},
+						access: intent.access.map((endpoint) =>
+							endpoint.primary
+								? {
+										...endpoint,
+										path: "admin",
+									}
+								: endpoint,
+						),
 					},
 					"188.245.64.152",
 				),
