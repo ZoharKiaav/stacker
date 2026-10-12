@@ -82,6 +82,18 @@ const createStore = ({
 
 			return {
 				primaryUrl: "http://vpstack-0123456789abcdef-188-245-64-152.sslip.io",
+				endpoints: [
+					{
+						key: "website",
+						url: "http://vpstack-0123456789abcdef-188-245-64-152.sslip.io",
+						primary: true,
+					},
+					{
+						key: "support",
+						url: "http://support-vpstack-0123456789abcdef-188-245-64-152.sslip.io",
+						primary: false,
+					},
+				],
 				duplicate: accessDuplicate,
 			};
 		},
@@ -121,6 +133,18 @@ describe("first Compose persistence", () => {
 			result.primaryUrl,
 			"http://vpstack-0123456789abcdef-188-245-64-152.sslip.io",
 		);
+		assert.deepEqual(result.endpoints, [
+			{
+				key: "website",
+				url: "http://vpstack-0123456789abcdef-188-245-64-152.sslip.io",
+				primary: true,
+			},
+			{
+				key: "support",
+				url: "http://support-vpstack-0123456789abcdef-188-245-64-152.sslip.io",
+				primary: false,
+			},
+		]);
 	});
 
 	it("repairs or reuses access for an existing Compose", async () => {
@@ -143,6 +167,18 @@ describe("first Compose persistence", () => {
 			result.primaryUrl,
 			"http://vpstack-0123456789abcdef-188-245-64-152.sslip.io",
 		);
+		assert.deepEqual(result.endpoints, [
+			{
+				key: "website",
+				url: "http://vpstack-0123456789abcdef-188-245-64-152.sslip.io",
+				primary: true,
+			},
+			{
+				key: "support",
+				url: "http://support-vpstack-0123456789abcdef-188-245-64-152.sslip.io",
+				primary: false,
+			},
+		]);
 	});
 	it("does not register or ensure access when Compose creation fails", async () => {
 		const { store, calls } = createStore();
