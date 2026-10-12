@@ -7,6 +7,19 @@ const mapping = {
 	workloadType: "vpstack" as const,
 	customerSafeProperties: {
 		displayName: "Client Operations",
+		primaryUrl: "http://vpstack-0123456789abcdef-188-245-64-152.sslip.io",
+		endpoints: [
+			{
+				key: "website",
+				url: "http://vpstack-0123456789abcdef-188-245-64-152.sslip.io",
+				primary: true,
+			},
+			{
+				key: "support",
+				url: "http://support-vpstack-0123456789abcdef-188-245-64-152.sslip.io",
+				primary: false,
+			},
+		],
 	},
 	resources: [
 		{
@@ -36,6 +49,22 @@ describe("customer-safe provisioning status", () => {
 
 		assert.equal(response.resource.resourceId, "compose-primary");
 		assert.equal(response.error, null);
+		assert.equal(
+			response.customerSafe.primaryUrl,
+			"http://vpstack-0123456789abcdef-188-245-64-152.sslip.io",
+		);
+		assert.deepEqual(response.customerSafe.endpoints, [
+			{
+				key: "website",
+				url: "http://vpstack-0123456789abcdef-188-245-64-152.sslip.io",
+				primary: true,
+			},
+			{
+				key: "support",
+				url: "http://support-vpstack-0123456789abcdef-188-245-64-152.sslip.io",
+				primary: false,
+			},
+		]);
 	});
 
 	it("returns a customer-safe failed operation", () => {

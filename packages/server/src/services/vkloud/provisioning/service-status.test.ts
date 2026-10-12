@@ -10,6 +10,19 @@ describe("customer-safe provisioning service status", () => {
 			serviceState: "active",
 			customerSafeProperties: {
 				displayName: "Client Operations",
+				primaryUrl: "http://vpstack-0123456789abcdef-188-245-64-152.sslip.io",
+				endpoints: [
+					{
+						key: "website",
+						url: "http://vpstack-0123456789abcdef-188-245-64-152.sslip.io",
+						primary: true,
+					},
+					{
+						key: "support",
+						url: "http://support-vpstack-0123456789abcdef-188-245-64-152.sslip.io",
+						primary: false,
+					},
+				],
 			},
 			resources: [
 				{
@@ -30,6 +43,48 @@ describe("customer-safe provisioning service status", () => {
 		assert.equal(response.state, "active");
 		assert.equal(response.resources.length, 2);
 		assert.equal(response.resources[0]?.primary, true);
+		assert.equal(
+			response.customerSafe.primaryUrl,
+			"http://vpstack-0123456789abcdef-188-245-64-152.sslip.io",
+		);
+		assert.deepEqual(response.customerSafe.endpoints, [
+			{
+				key: "website",
+				url: "http://vpstack-0123456789abcdef-188-245-64-152.sslip.io",
+				primary: true,
+			},
+			{
+				key: "support",
+				url: "http://support-vpstack-0123456789abcdef-188-245-64-152.sslip.io",
+				primary: false,
+			},
+		]);
+	});
+
+	it("rejects infrastructure fields in customer-safe endpoints", () => {
+		assert.throws(
+			() =>
+				buildProvisioningServiceStatus({
+					billingServiceId: "service-42",
+					workloadType: "vpstack",
+					serviceState: "active",
+					customerSafeProperties: {
+						endpoints: [
+							{
+								key: "website",
+								url: "http://vpstack-0123456789abcdef-188-245-64-152.sslip.io",
+								primary: true,
+								host: "internal.example.invalid",
+								port: 80,
+								serviceName: "web",
+								internalPath: "/",
+							},
+						],
+					},
+					resources: [],
+				}),
+			/Unrecognized keys/,
+		);
 	});
 
 	it("supports a service before resources are assigned", () => {
