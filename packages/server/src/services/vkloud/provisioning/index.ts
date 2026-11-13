@@ -38,6 +38,7 @@ export * from "./response";
 export * from "./service-status";
 export * from "./status-persistence";
 export * from "./status-response";
+export * from "./template-catalogue";
 export * from "./vpay-auth";
 export * from "./vpay-key";
 export * from "./vpay-key-metadata";

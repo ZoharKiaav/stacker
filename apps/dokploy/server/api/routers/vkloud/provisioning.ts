@@ -2,11 +2,14 @@ import {
 	acceptProvisioningRequest,
 	buildProvisioningServiceStatus,
 	buildProvisioningStatusResponse,
+	buildTemplateCatalogueResponse,
 	findBillingServiceMappingOrThrow,
 	findProvisioningOperationStatus,
+	loadExecutionTargetCatalogue,
 	provisioningRequestSchema,
 	provisioningResponseSchema,
 	provisioningServiceStatusSchema,
+	templateCatalogueResponseSchema,
 } from "@dokploy/server";
 import { z } from "zod";
 import { createTRPCRouter, vpayProcedure } from "../../trpc";
@@ -22,6 +25,7 @@ const serviceStatusInput = z.object({
 	billingServiceId: z.string().min(1).max(255),
 });
 
+const templateCatalogueInput = z.object({}).strict();
 export const vkloudProvisioningRouter = createTRPCRouter({
 	accept: vpayProcedure
 		.meta({
@@ -59,18 +63,13 @@ export const vkloudProvisioningRouter = createTRPCRouter({
 
 			if (!accepted.duplicate) {
 				void executeAcceptedProvisioningOperation({
-					organizationId:
-						ctx.session.activeOrganizationId,
+					organizationId: ctx.session.activeOrganizationId,
 					operationId: accepted.operation.id,
 				}).catch((error) => {
-					console.error(
-						"Automatic vKloud provisioning execution failed",
-						{
-							operationId:
-								accepted.operation.id,
-							error,
-						},
-					);
+					console.error("Automatic vKloud provisioning execution failed", {
+						operationId: accepted.operation.id,
+						error,
+					});
 				});
 			}
 
@@ -100,6 +99,24 @@ export const vkloudProvisioningRouter = createTRPCRouter({
 			});
 		}),
 
+	templateCatalogue: vpayProcedure
+		.meta({
+			openapi: {
+				enabled: true,
+				method: "GET",
+				path: "/vkloud/provisioning/v1/templates",
+				override: true,
+			},
+		})
+		.input(templateCatalogueInput)
+		.output(templateCatalogueResponseSchema)
+		.query(async ({ ctx }) => {
+			const targets = await loadExecutionTargetCatalogue(
+				ctx.session.activeOrganizationId,
+			);
+
+			return buildTemplateCatalogueResponse(targets);
+		}),
 	serviceStatus: vpayProcedure
 		.meta({
 			openapi: {
