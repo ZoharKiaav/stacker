@@ -2,8 +2,17 @@ import { z } from "zod";
 import { operationStateSchema, workloadTypeSchema } from "./contract";
 import { provisioningErrorSchema } from "./errors";
 
+export const customerSafeEndpointSchema = z
+	.object({
+		key: z.string().min(1).max(100),
+		url: z.url(),
+		primary: z.boolean(),
+	})
+	.strict();
+
 export const customerSafePropertiesSchema = z.object({
 	primaryUrl: z.url().optional(),
+	endpoints: z.array(customerSafeEndpointSchema).max(100).optional(),
 	displayName: z.string().min(1).max(255).optional(),
 	healthStatus: z.string().min(1).max(100).optional(),
 	supportReference: z.string().min(1).max(255).optional(),

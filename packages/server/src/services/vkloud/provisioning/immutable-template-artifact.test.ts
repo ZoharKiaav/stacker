@@ -4,14 +4,14 @@ import { verifyImmutableTemplateArtifact } from "./immutable-template-artifact";
 
 const identity = {
 	templateId: "clientops-starter",
-	templateVersion: "1.0.0",
-	baseUrl: "https://templates.vkloud.example/releases/1.0.0",
+	templateVersion: "1.0.3",
+	baseUrl: "https://templates.vkloud.example/releases/1.0.3",
 };
 
-const fetched = {
+const legacyFetched = {
 	metadata: {
 		id: "clientops-starter",
-		version: "1.0.0",
+		version: "1.0.3",
 		name: "Client Operations",
 	},
 	access: {
@@ -20,32 +20,91 @@ const fetched = {
 		path: "/",
 		internalPath: "/",
 	},
-	dockerCompose: "services:\n  app:\n    image: example/app:1.0.0\n",
+	dockerCompose: "services:\n  web:\n    image: example/web:1.0.3\n",
+};
+
+const multiEndpointFetched = {
+	...legacyFetched,
+	access: [
+		{
+			key: "support",
+			serviceName: "support",
+			port: 80,
+			path: "/",
+			internalPath: "/",
+			suggestedSubdomain: "support",
+			primary: false,
+		},
+		{
+			key: "website",
+			serviceName: "website",
+			port: 80,
+			path: "/",
+			internalPath: "/",
+			suggestedSubdomain: "www",
+			primary: true,
+		},
+	],
 };
 
 describe("immutable template artifact", () => {
-	it("accepts an exact approved template identity", () => {
-		const artifact = verifyImmutableTemplateArtifact(identity, fetched);
+	it("normalises a legacy access object into one primary endpoint", () => {
+		const artifact = verifyImmutableTemplateArtifact(identity, legacyFetched);
 
-		assert.equal(artifact.templateId, "clientops-starter");
-		assert.equal(artifact.templateVersion, "1.0.0");
-		assert.equal(artifact.contentDigest.length, 64);
+		assert.deepEqual(artifact.access, [
+			{
+				key: "primary",
+				serviceName: "web",
+				port: 80,
+				path: "/",
+				internalPath: "/",
+				primary: true,
+			},
+		]);
+	});
+
+	it("accepts and sorts a multi-endpoint access declaration", () => {
+		const artifact = verifyImmutableTemplateArtifact(
+			identity,
+			multiEndpointFetched,
+		);
+
+		assert.equal(artifact.access.length, 2);
+		assert.equal(artifact.access[0]?.key, "support");
+		assert.equal(artifact.access[1]?.key, "website");
+		assert.equal(artifact.access[1]?.primary, true);
 	});
 
 	it("creates a deterministic content digest", () => {
 		assert.equal(
-			verifyImmutableTemplateArtifact(identity, fetched).contentDigest,
-			verifyImmutableTemplateArtifact(identity, fetched).contentDigest,
+			verifyImmutableTemplateArtifact(identity, multiEndpointFetched)
+				.contentDigest,
+			verifyImmutableTemplateArtifact(identity, multiEndpointFetched)
+				.contentDigest,
 		);
+	});
+
+	it("creates the same digest regardless of endpoint input order", () => {
+		const first = verifyImmutableTemplateArtifact(
+			identity,
+			multiEndpointFetched,
+		);
+
+		const second = verifyImmutableTemplateArtifact(identity, {
+			...multiEndpointFetched,
+			access: [...multiEndpointFetched.access].reverse(),
+		});
+
+		assert.equal(first.contentDigest, second.contentDigest);
 	});
 
 	it("rejects another template ID", () => {
 		assert.throws(
 			() =>
 				verifyImmutableTemplateArtifact(identity, {
-					...fetched,
+					...legacyFetched,
 					metadata: {
-						...fetched.metadata,
+						...legacyFetched.metadata,
 						id: "another-template",
 					},
 				}),
@@ -57,9 +116,9 @@ describe("immutable template artifact", () => {
 		assert.throws(
 			() =>
 				verifyImmutableTemplateArtifact(identity, {
-					...fetched,
+					...legacyFetched,
 					metadata: {
-						...fetched.metadata,
+						...legacyFetched.metadata,
 						version: "2.0.0",
 					},
 				}),
@@ -70,7 +129,7 @@ describe("immutable template artifact", () => {
 	it("rejects an empty Compose definition", () => {
 		assert.throws(() =>
 			verifyImmutableTemplateArtifact(identity, {
-				...fetched,
+				...legacyFetched,
 				dockerCompose: "",
 			}),
 		);
@@ -83,32 +142,105 @@ describe("immutable template artifact", () => {
 					...identity,
 					baseUrl: "",
 				},
-				fetched,
+				legacyFetched,
 			),
 		);
 	});
 
-	it("rejects invalid access metadata", () => {
+	it("rejects an endpoint with an invalid port", () => {
 		assert.throws(() =>
 			verifyImmutableTemplateArtifact(identity, {
-				...fetched,
-				access: {
-					...fetched.access,
-					port: 0,
-				},
+				...multiEndpointFetched,
+				access: [
+					{
+						...multiEndpointFetched.access[0],
+						port: 0,
+					},
+					multiEndpointFetched.access[1],
+				],
 			}),
 		);
 	});
 
-	it("changes the digest when access metadata changes", () => {
-		const original = verifyImmutableTemplateArtifact(identity, fetched);
+	it("rejects duplicate endpoint keys", () => {
+		assert.throws(
+			() =>
+				verifyImmutableTemplateArtifact(identity, {
+					...multiEndpointFetched,
+					access: [
+						multiEndpointFetched.access[0],
+						{
+							...multiEndpointFetched.access[1],
+							key: "support",
+						},
+					],
+				}),
+			/endpoint key support is duplicated/,
+		);
+	});
+
+	it("rejects duplicate endpoint routes", () => {
+		assert.throws(
+			() =>
+				verifyImmutableTemplateArtifact(identity, {
+					...multiEndpointFetched,
+					access: [
+						multiEndpointFetched.access[0],
+						{
+							...multiEndpointFetched.access[0],
+							key: "support-two",
+							primary: true,
+						},
+					],
+				}),
+			/duplicates another route/,
+		);
+	});
+
+	it("rejects a collection without a primary endpoint", () => {
+		assert.throws(
+			() =>
+				verifyImmutableTemplateArtifact(identity, {
+					...multiEndpointFetched,
+					access: multiEndpointFetched.access.map((endpoint) => ({
+						...endpoint,
+						primary: false,
+					})),
+				}),
+			/exactly one primary endpoint/,
+		);
+	});
+
+	it("rejects a collection with multiple primary endpoints", () => {
+		assert.throws(
+			() =>
+				verifyImmutableTemplateArtifact(identity, {
+					...multiEndpointFetched,
+					access: multiEndpointFetched.access.map((endpoint) => ({
+						...endpoint,
+						primary: true,
+					})),
+				}),
+			/exactly one primary endpoint/,
+		);
+	});
+
+	it("changes the digest when endpoint metadata changes", () => {
+		const original = verifyImmutableTemplateArtifact(
+			identity,
+			multiEndpointFetched,
+		);
 
 		const changed = verifyImmutableTemplateArtifact(identity, {
-			...fetched,
-			access: {
-				...fetched.access,
-				port: 8080,
-			},
+			...multiEndpointFetched,
+			access: multiEndpointFetched.access.map((endpoint) =>
+				endpoint.key === "support"
+					? {
+							...endpoint,
+							port: 8080,
+						}
+					: endpoint,
+			),
 		});
 
 		assert.notEqual(original.contentDigest, changed.contentDigest);

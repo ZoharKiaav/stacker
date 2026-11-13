@@ -11,8 +11,15 @@ export interface CreatedComposeRecord {
 	name: string;
 }
 
+export interface CustomerSafeEndpoint {
+	key: string;
+	url: string;
+	primary: boolean;
+}
+
 export interface EnsuredCustomerAccess {
 	primaryUrl: string;
+	endpoints: CustomerSafeEndpoint[];
 	duplicate: boolean;
 }
 
@@ -55,6 +62,7 @@ export interface PersistFirstComposeRecordResult {
 	resourceName: string;
 	duplicate: boolean;
 	primaryUrl: string;
+	endpoints: CustomerSafeEndpoint[];
 	accessDuplicate: boolean;
 }
 
@@ -83,6 +91,7 @@ export const persistFirstComposeRecord = async (
 			resourceName: existing.resourceName ?? input.intent.compose.name,
 			duplicate: true,
 			primaryUrl: access.primaryUrl,
+			endpoints: access.endpoints,
 			accessDuplicate: access.duplicate,
 		};
 	}
@@ -114,6 +123,7 @@ export const persistFirstComposeRecord = async (
 		resourceName: compose.name,
 		duplicate: false,
 		primaryUrl: access.primaryUrl,
+		endpoints: access.endpoints,
 		accessDuplicate: access.duplicate,
 	};
 };
