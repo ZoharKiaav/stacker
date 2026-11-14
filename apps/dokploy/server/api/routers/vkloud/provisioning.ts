@@ -25,7 +25,7 @@ const serviceStatusInput = z.object({
 	billingServiceId: z.string().min(1).max(255),
 });
 
-const templateCatalogueInput = z.object({}).strict();
+const templateCatalogueInput = z.object({});
 export const vkloudProvisioningRouter = createTRPCRouter({
 	accept: vpayProcedure
 		.meta({
